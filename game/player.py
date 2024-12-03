@@ -3,7 +3,7 @@ from re import I
 import game.ship as ship
 import game.crewmate as crewmate
 from game.context import Context
-import jsonpickle
+#import jsonpickle
 import game.display as display
 import game.config as config
 import game.items as items
@@ -58,6 +58,7 @@ class Player (Context):
         self.verbs['inventory'] = self
         self.verbs['restock'] = self
         self.verbs['skills'] = self
+        self.verbs['read'] = self
 
         self.seen = []
         for i in range (0, self.world.worldsize):
