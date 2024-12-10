@@ -76,7 +76,7 @@ class Cave(location.SubLocation):
         self.name = "cave"
         self.island_map = island_map
         self.player = player
-        self.enemy = Enemy("cave monster", 50) #adding the cave monster
+        self.enemy = Skeleton("cave monster", 50) #adding the cave monster
         
     def enter(self):
         display.announce("you enter a dark cave. A terrifying cave monster blocks your path")
@@ -110,7 +110,7 @@ class Cliff(location.SubLocation):
         self.name = "cliff"
         self.island_map = island_map
         self.player = player
-        self.enemy = Enemy("cliff guardian", 70)
+        self.enemy = Guardian("cliff guardian", 70)
 
     def enter(self):
         display.announce("You arrive at a steep cliff. A guardian blocks the way to a map fragment!")
@@ -152,7 +152,7 @@ class Jungle(location.SubLocation):
        self.name = "jungle"
        self.island_map = island_map
        self.player = player
-       self.enemy= Enemy("jungle beast", 70)
+       self.enemy= JungleBeast("jungle beast", 70)
 
     def enter(self):
         display.announce("You arrive at the jungle. A beast blocks the way to a map fragment!")
@@ -191,7 +191,7 @@ class Lagoon(location.SubLocation):
         self.name = "lagoon"
         self.island_map = island_map
         self.player = player
-        self.enemy = Enemy("Lagoon Serpent", 120)
+        self.enemy = LagoonBeast("Lagoon Serpent", 120)
 
     def enter(self):
         display.announce("You arrive at a tranquil lagoon, but suddenly the waters stir!")
