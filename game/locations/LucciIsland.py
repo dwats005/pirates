@@ -69,6 +69,7 @@ class Beach_with_ship (location.SubLocation):
             display.announce ("You return to your ship.")
             self.main_location.end_visit()
 
+#Cave Class
 class Cave(location.SubLocation): 
     def __init__(self, main_location, island_map, player):
         super().__init__(main_location)
@@ -86,10 +87,121 @@ class Cave(location.SubLocation):
 class Skeleton(combat.Monster):
     def __init__ (self, name):
         attacks = {}
-        attacks["slash 1"] = ["slashes", random.randrange(35,51), (5,15)]
-        attacks["slash 2"] = ["slashes", random.randrange(35,51), (1,10)]
-        attacks["shank"] = ["shanks", random.randrange(35,51), (1,10)]
+        attacks["Ghostly Blade"] = ["slashes", random.randrange(35,51), (5,15)]
+        attacks["Wailing Cut"] = ["slashes", random.randrange(35,51), (1,10)]
+        attacks["Anchored Strikes"] = ["strikes", random.randrange(35,51), (1,10)]
        
         super().__init__(name, random.randrange(7,20), attacks, 75 + random.randrange(-10,11)) 
-        self.type_name = "Black Bear"
+        self.type_name = "Pirate Skeleton"
         
+    if self.player.health > 0:
+            display.announce("You have defeated the monster!", pause=False)
+            display.announce("You find a map fragment on the ground!", pause=False)
+            fragment = self.island_map.fragments[0]  # Northern fragment (fragment_id 1)
+            fragment.find()
+            self.player.add_to_inventory(fragment)
+    else:
+            display.announce("You are defeated and unable to retrieve the fragment.", pause=False)
+
+#Cliff Class
+class Cliff(location.SubLocation):
+    def __init__(self, main_location, island_map, player):
+        super().__init__(main_location)
+        self.name = "cliff"
+        self.island_map = island_map
+        self.player = player
+        self.enemy = Enemy("cliff guardian", 70)
+
+    def enter(self):
+        display.announce("You arrive at a steep cliff. A guardian blocks the way to a map fragment!")
+        display.announce("Prepare to fight!")
+
+class Guardian(combat.Monster):
+    def __init__ (self, name):
+        attacks = {}
+        attacks["Craggy Crush"] = ["crushes", random.randrange(35,51), (5,15)]
+        attacks["Titan's Grasp"] = ["grasped", random.randrange(35,51), (1,10)]
+        attacks["Gravelstorm"] = ["stormed", random.randrange(35,51), (1,10)] 
+
+        super().__init__(name, random.randrange(7,20), attacks, 75 + random.randrange(-10,11)) 
+        self.type_name = "Cliff Guardian" 
+
+        while self.enemy.health > 0 and self.player.health > 0:
+            action = input("What will you do? (attack/run): ").strip().lower()
+            if action == "attack":
+                self.player.attack(self.enemy)
+                if self.enemy.health > 0:
+                    self.enemy.attack(self.player)
+            elif action == "run":
+                display.announce("You run back to the beach!", pause=False)
+                return
+
+        if self.player.health > 0:
+            display.announce("You have defeated the guardian!", pause=False)
+            display.announce("You find another map fragment!", pause=False)
+            fragment = self.island_map.fragments[1]  # Eastern fragment (fragment_id 2)
+            fragment.find()
+            self.player.add_to_inventory(fragment)
+        else:
+            display.announce("You are defeated and unable to retrieve the fragment.", pause=False) 
+
+#Jungle Class
+class Jungle(location.SubLocation):
+    def __init__(self, main_location, island_map, player):
+       super().__init__(main_location)
+       self.name = "jungle"
+       self.island_map = island_map
+       self.player = player
+       self.enemy= Enemy("jungle beast", 70)
+
+    def enter(self):
+        display.announce("You arrive at the jungle. A beast blocks the way to a map fragment!")
+        display.announce("Prepare to fight!")
+
+class JungleBeast(combat.Monster):
+    def __init__(self, name):
+        attacks = {}
+        attacks["scratch 1"] = ["scratches", random.randrange(35,51), (5,15)]
+        attacks["scratch 2"] = ["scratches", random.randrange(35,51) (1,10)]
+        attacks["kick"] = ["kicks", random.randrange(35,51), (1,10)] 
+        
+        while self.enemy.health > 0 and self.player.health > 0:
+            action = input("What will you do? (attack/run): ").strip().lower()
+            if action == "attack":
+                self.player.attack(self.enemy)
+                if self.enemy.health > 0:
+                    self.enemy.attack(self.player)
+            elif action == "run":
+                display.announce("You run back to the beach!", pause=False)
+                return
+
+        if self.player.health > 0:
+            display.announce("You have defeated the Jungle Beast!", pause=False)
+            display.announce("You find the third map fragment hidden under a large rock!", pause=False)
+            fragment = self.island_map.fragments[2]  # Southern jungle fragment (fragment_id 3)
+            fragment.find()
+            self.player.add_to_inventory(fragment)
+        else:
+            display.announce("You are defeated and unable to retrieve the fragment.", pause=False)
+
+#Lagoon Class
+class Lagoon(location.SubLocation):
+    def __init__(self, main_location, island_map, player):
+        super().__init__(main_location)
+        self.name = "lagoon"
+        self.island_map = island_map
+        self.player = player
+        self.enemy = Enemy("Lagoon Serpent", 120)
+
+    def enter(self):
+        display.announce("You arrive at a tranquil lagoon, but suddenly the waters stir!")
+        display.announce("A massive Lagoon Serpent emerges, blocking your way to the final map fragment!")
+        display.announce("Prepare for an intense battle!")
+
+class LagoonBeast(combat.Monster):
+    def __init__(self, name):
+        attacks = {}
+        attacks["Boggy Grasp"] = ["Grasps", random.randrange(35,51), (5,15)]
+        attacks["Snapping Maw"] = ["Snapping", random.randrange(38,64), (8,18)]
+        attacks["Fang-Soaked Bite"] = ["Bites", random.randrange(36,55), (6,16)]
+        attacks["Silt Storm"] = ["Stormed", random.randrange(30,45), (4, 14)]
