@@ -252,6 +252,8 @@ class Lagoon(location.SubLocation):
         self.island_map = island_map
         self.player = player
         self.enemy = LagoonBeast("Lagoon Serpent")
+        self.reward_weapon = Weapon("Water Blade", damage=22)
+        self.reward_armor = Armor("Aquatic Shell", defense=8)
 
     def enter(self):
         display.announce("You arrive at a tranquil lagoon, but suddenly the waters stir!")
@@ -268,6 +270,18 @@ class Lagoon(location.SubLocation):
             elif action == "run":
                 display.announce("You run back to the beach!", pause=False)
                 return
+
+        if self.player.health > 0:
+            display.announce("You have defeated the Lagoon Serpent!", pause=False)
+            display.announce("You find the final map fragment and rare treasures!", pause=False)
+            fragment = self.island_map.fragments[3]  # Western fragment
+            fragment.find()
+            self.player.add_to_inventory(fragment)
+            self.player.add_to_inventory(self.reward_weapon)
+            self.player.add_to_inventory(self.reward_armor)
+            display.announce(f"You gained {self.reward_weapon.name} and {self.reward_armor.name}!")
+        else:
+            display.announce("You are defeated and unable to retrieve the items.", pause=False)
 
         if self.player.health > 0:
             display.announce("You have defeated the Lagoon Serpent!", pause=False)
