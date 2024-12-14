@@ -324,6 +324,17 @@ class LagoonBeast(combat.Monster):
         super().__init__(name, random.randrange(7,20), attacks, 75 + random.randrange(-10,11))
         self.type_name = "Lagoon Serpent"
 
+class FinalBoss(combat.Monster):
+    def __init__(self, name):
+        attacks = {
+            "Shadow Strike": ["slashes", random.randrange(40, 60), (8, 15)],
+            "Cursed Cannonball": ["launches", random.randrange(50, 70), (10, 20)],
+            "Ghostly Roar": ["terrifies", random.randrange(30, 50), (5, 10)],
+        }
+        super().__init__(name, random.randrange(20, 30), attacks, 150 + random.randrange(-20, 20))
+        self.type_name = "Ghostly Pirate Captain"
+
+
 class TreasureSite(location.SubLocation):
     def __init__(self, main_location, player):
         super().__init__(main_location)
@@ -375,17 +386,23 @@ class TreasureSite(location.SubLocation):
     def claim_treasure(self):
         display.announce("You open the treasure chest and find riches beyond your imagination!", pause=False)
         display.announce("You also find new weapons and armor to aid in your future adventures!", pause=False)
-        # Example of treasure loot
+        # treasure loot
         self.player.add_to_inventory(Item("Golden Cutlass", 100))
         self.player.add_to_inventory(Item("Enchanted Armor", 150))
 
-class FinalBoss(combat.Monster):
-    def __init__(self, name):
-        attacks = {
-            "Shadow Strike": ["slashes", random.randrange(40, 60), (8, 15)],
-            "Cursed Cannonball": ["launches", random.randrange(50, 70), (10, 20)],
-            "Ghostly Roar": ["terrifies", random.randrange(30, 50), (5, 10)],
-        }
-        super().__init__(name, random.randrange(20, 30), attacks, 150 + random.randrange(-20, 20))
-        self.type_name = "Ghostly Pirate Captain"
+        # End of game
+        self.conclude_game()
+    def conclude_game(self):
+        display.announce("Congratulations! You have claimed the ultimate treasure and defeated Captain Dreadbeard!", pause=False)
+        display.announce("The island falls silent as you stand victorious.", pause=False)
+        display.announce("YOU WIN!", pause=False)
+
+        # Optionally, offer the player a replay or exit prompt
+        action = input("Would you like to play again? (yes/no): ").strip().lower()
+        if action == "yes":
+            display.announce("Restarting the game...")
+            # Add logic to restart the game here if applicable
+        else:
+            display.announce("Thank you for playing! Goodbye.")
+            exit()
 
