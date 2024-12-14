@@ -9,7 +9,7 @@ import game.combat as combat
 #Map fragment class
 class Map_Fragment(Item):
     def __init__(self, id, description):
-        super().__init__(f"map_fragment_{id}", 5)  # Fixed string formatting
+        super().__init__(f"map_fragment_{id}", 5)  
         self.description = description
         self.found = False  # The fragment is initially hidden
 
