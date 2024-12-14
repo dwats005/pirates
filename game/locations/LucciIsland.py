@@ -244,3 +244,109 @@ class LagoonBeast(combat.Monster):
 
         super().__init__(name, random.randrange(7,20), attacks, 75 + random.randrange(-10,11))
         self.type_name = "Lagoon Serpent"
+
+class TreasureSite(location.SubLocation):
+    def __init__(self, main_location, player):
+        super().__init__(main_location)
+        self.name = "treasure site"
+        self.player = player
+        self.final_boss = FinalBoss("Captain Dreadbeard")
+
+    def enter(self):
+        display.announce("You arrive at the treasure site, guided by the completed map!")
+        display.announce("A puzzle awaits to unlock the exact treasure location.")
+        if self.solve_puzzle():
+            display.announce("The ground trembles and reveals a hidden cavern where the treasure lies!")
+            display.announce("Suddenly, the infamous Captain Dreadbeard appears, guarding the treasure!")
+            self.fight_final_boss()
+        else:
+            display.announce("You failed to solve the puzzle. The treasure remains hidden.", pause=False)
+
+    def solve_puzzle(self):
+        puzzle_question = "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?"
+        display.announce("Solve the riddle to find the treasure:\n" + puzzle_question)
+        attempts = 3
+        while attempts > 0:
+            answer = input("Your answer: ").strip().lower()
+            if answer == "echo":
+                display.announce("Correct! You have solved the puzzle.", pause=False)
+                return True
+            else:
+                attempts -= 1
+                display.announce(f"Incorrect! {attempts} attempts remaining.")
+        return False
+
+    def fight_final_boss(self):
+        display.announce("Prepare for the ultimate battle!")
+        while self.final_boss.health > 0 and self.player.health > 0:
+            action = input("What will you do? (attack/run): ").strip().lower()
+            if action == "attack":
+                self.player.attack(self.final_boss)
+                if self.final_boss.health > 0:
+                    self.final_boss.attack(self.player)
+            elif action == "run":
+                display.announce("You retreat, leaving the treasure behind!", pause=False)
+                return
+        if self.player.health > 0:
+            display.announce("You have defeated Captain Dreadbeard!", pause=False)
+            self.claim_treasure()
+        else:
+            display.announce("You are defeated. The treasure remains out of reach.", pause=False)
+
+    def claim_treasure(self):
+        display.announce("You open the treasure chest and find riches beyond your imagination!", pause=False)
+        display.announce("You also find new weapons and armor to aid in your future adventures!", pause=False)
+        # Example of treasure loot
+        self.player.add_to_inventory(Item("Golden Cutlass", 100))
+        self.player.add_to_inventory(Item("Enchanted Armor", 150))
+
+class FinalBoss(combat.Monster):
+    def __init__(self, name):
+        attacks = {
+            "Shadow Strike": ["slashes", random.randrange(40, 60), (8, 15)],
+            "Cursed Cannonball": ["launches", random.randrange(50, 70), (10, 20)],
+            "Ghostly Roar": ["terrifies", random.randrange(30, 50), (5, 10)],
+        }
+        super().__init__(name, random.randrange(20, 30), attacks, 150 + random.randrange(-20, 20))
+        self.type_name = "Ghostly Pirate Captain"
+
+class Island(location.Location):
+    def __init__(self, x, y, w):
+        super().__init__(x, y, w)
+        self.name = "Lucci's island"
+        self.symbol = 'I'
+        self.visitable = True
+        self.locations = {}
+        
+        island_map = Map()
+        player = None  # This should be set to the actual player object
+        
+        self.locations["beach"] = Beach_with_ship(self)
+        self.locations["cave"] = Cave(self, island_map, player)
+        self.locations["cliff"] = Cliff(self, island_map, player)
+        self.locations["jungle"] = Jungle(self, island_map, player)
+        self.locations["lagoon"] = Lagoon(self, island_map, player)
+        self.locations["treasure_site"] = TreasureSite(self, player)
+        
+        self.starting_location = self.locations["beach"]
+
+    def enter(self, ship):
+        display.announce("Arrived at an island.", pause=False)
+
+class Map(Item):
+    def __init__(self):
+        super().__init__("Map", 20)
+        self.fragments = [
+            Map_Fragment(1, "The northern part of the island"), 
+            Map_Fragment(2, "The southern part of the island"),
+            Map_Fragment(3, "The eastern part of the island"),
+            Map_Fragment(4, "The western part of the island")
+        ]
+        self.is_complete = False
+
+    def assemble(self):
+        if all(fragment.found for fragment in self.fragments):
+            self.is_complete = True
+            display.announce("You have assembled all the map fragments into a full map!", pause=False)
+        else:
+            display.announce("You don't have all the map fragments yet.", pause=False)
