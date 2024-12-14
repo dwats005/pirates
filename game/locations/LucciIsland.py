@@ -30,7 +30,23 @@ class Map(Item):
             Map_Fragment(3, "The eastern part of the island"),
             Map_Fragment(4, "The western part of the island")
         ]
-    
+        self.is_complete = False
+
+    def assemble(self):
+        if all(fragment.found for fragment in self.fragments):
+            self.is_complete = True
+            display.announce("You have assembled all the map fragments into a full map!", pause=False)
+        else:
+            display.announce("You don't have all the map fragments yet.", pause=False)
+
+    def add_fragment(self, id, description):
+        self.fragments.append(Map_Fragment(id, description))
+        display.announce(f"A new map fragment was added: {description}")
+
+    def remove_fragment(self, id):
+        self.fragments = [f for f in self.fragments if f.id != id]
+        display.announce(f"Map fragment with ID {id} was removed.")
+
     def find_fragment(self, fragment_id):
         # Implemented the method to find a specific fragment
         for fragment in self.fragments:
@@ -45,18 +61,23 @@ class Island(location.Location):
         self.symbol = 'I'
         self.visitable = True
         self.locations = {}
-        
-        # Note: This will need to be adjusted based on how these classes are instantiated
-        island_map = Map()
-        player = None  # This should be set to the actual player object
-        
-        self.locations["beach"] = Beach_with_ship(self)
-        self.locations["cave"] = Cave(self, island_map, player)
-        self.locations["cliff"] = Cliff(self, island_map, player)
-        self.locations["jungle"] = Jungle(self, island_map, player)
-        self.locations["lagoon"] = Lagoon(self, island_map, player)
-        
+
+        self.island_map = Map()
+        self.player = None  # This should be set to the actual player object
+
+        self.initialize_locations()
+
+    def initialize_locations(self):
+        self.locations = {
+            "beach": Beach_with_ship(self),
+            "cave": Cave(self, self.island_map, self.player),
+            "cliff": Cliff(self, self.island_map, self.player),
+            "jungle": Jungle(self, self.island_map, self.player),
+            "lagoon": Lagoon(self, self.island_map, self.player),
+            "treasure_site": TreasureSite(self, self.player),
+        }
         self.starting_location = self.locations["beach"]
+
 
     def enter(self, ship):
         display.announce("arrived at an island", pause=False)
@@ -368,43 +389,3 @@ class FinalBoss(combat.Monster):
         super().__init__(name, random.randrange(20, 30), attacks, 150 + random.randrange(-20, 20))
         self.type_name = "Ghostly Pirate Captain"
 
-class Island(location.Location):
-    def __init__(self, x, y, w):
-        super().__init__(x, y, w)
-        self.name = "Lucci's island"
-        self.symbol = 'I'
-        self.visitable = True
-        self.locations = {}
-        
-        island_map = Map()
-        player = None  # This should be set to the actual player object
-        
-        self.locations["beach"] = Beach_with_ship(self)
-        self.locations["cave"] = Cave(self, island_map, player)
-        self.locations["cliff"] = Cliff(self, island_map, player)
-        self.locations["jungle"] = Jungle(self, island_map, player)
-        self.locations["lagoon"] = Lagoon(self, island_map, player)
-        self.locations["treasure_site"] = TreasureSite(self, player)
-        
-        self.starting_location = self.locations["beach"]
-
-    def enter(self, ship):
-        display.announce("Arrived at an island.", pause=False)
-
-class Map(Item):
-    def __init__(self):
-        super().__init__("Map", 20)
-        self.fragments = [
-            Map_Fragment(1, "The northern part of the island"), 
-            Map_Fragment(2, "The southern part of the island"),
-            Map_Fragment(3, "The eastern part of the island"),
-            Map_Fragment(4, "The western part of the island")
-        ]
-        self.is_complete = False
-
-    def assemble(self):
-        if all(fragment.found for fragment in self.fragments):
-            self.is_complete = True
-            display.announce("You have assembled all the map fragments into a full map!", pause=False)
-        else:
-            display.announce("You don't have all the map fragments yet.", pause=False)
