@@ -75,19 +75,38 @@ class Beach_with_ship(location.SubLocation):
             display.announce("You return to your ship.")
             self.main_location.end_visit()
 
+class Weapon(Item):
+    def __init__(self, name, damage):
+        super().__init__(name, value=damage * 10)
+        self.damage = damage
+
+    def use(self):
+        display.announce(f"You wield the {self.name}, increasing your attack power by {self.damage}.")
+
+class Armor(Item):
+    def __init__(self, name, defense):
+        super().__init__(name, value=defense * 15)
+        self.defense = defense
+
+    def use(self):
+        display.announce(f"You equip the {self.name}, reducing incoming damage by {self.defense}.")
+
 class Cave(location.SubLocation): 
     def __init__(self, main_location, island_map, player):
         super().__init__(main_location)
         self.name = "cave"
         self.island_map = island_map
         self.player = player
-        self.enemy = Skeleton("cave monster")
+        self.enemy = Skeleton("Cave Monster")
+        self.reward_weapon = Weapon("Bone Club", damage=15)  # New weapon
+        self.reward_armor = Armor("Ragged Cloak", defense=5)  # New armor
+
         
     def enter(self):
-        display.announce("you enter a dark cave. A terrifying cave monster blocks your path")
+        display.announce("You enter a dark cave. A terrifying cave monster blocks your path!")
         display.announce("Prepare to fight!")
-        
-        # Simulate combat
+
+        # Combat Simulation
         while self.enemy.health > 0 and self.player.health > 0:
             action = input("What will you do? (attack/run): ").strip().lower()
             if action == "attack":
@@ -99,13 +118,17 @@ class Cave(location.SubLocation):
                 return
 
         if self.player.health > 0:
-            display.announce("You have defeated the monster!", pause=False)
-            display.announce("You find a map fragment on the ground!", pause=False)
-            fragment = self.island_map.fragments[0]  # Northern fragment (fragment_id 1)
+            display.announce("You have defeated the Cave Monster!", pause=False)
+            display.announce("You find a map fragment and powerful items on the ground!", pause=False)
+            fragment = self.island_map.fragments[0]  # Northern fragment
             fragment.find()
             self.player.add_to_inventory(fragment)
+            self.player.add_to_inventory(self.reward_weapon)
+            self.player.add_to_inventory(self.reward_armor)
+            display.announce(f"You gained {self.reward_weapon.name} and {self.reward_armor.name}!")
         else:
-            display.announce("You are defeated and unable to retrieve the fragment.", pause=False)
+            display.announce("You are defeated and unable to retrieve the items.", pause=False)
+
 
 class Skeleton(combat.Monster):
     def __init__(self, name):
@@ -123,7 +146,10 @@ class Cliff(location.SubLocation):
         self.name = "cliff"
         self.island_map = island_map
         self.player = player
-        self.enemy = Guardian("cliff guardian")
+        self.enemy = Guardian("Cliff Guardian")
+        self.reward_weapon = Weapon("Stone Hammer", damage=20)
+        self.reward_armor = Armor("Rockplate Shield", defense=10)
+
 
     def enter(self):
         display.announce("You arrive at a steep cliff. A guardian blocks the way to a map fragment!")
@@ -141,13 +167,16 @@ class Cliff(location.SubLocation):
                 return
 
         if self.player.health > 0:
-            display.announce("You have defeated the guardian!", pause=False)
-            display.announce("You find another map fragment!", pause=False)
-            fragment = self.island_map.fragments[1]  # Eastern fragment (fragment_id 2)
+            display.announce("You have defeated the Cliff Guardian!", pause=False)
+            display.announce("You find a map fragment and rare items!", pause=False)
+            fragment = self.island_map.fragments[1]  # Eastern fragment
             fragment.find()
             self.player.add_to_inventory(fragment)
+            self.player.add_to_inventory(self.reward_weapon)
+            self.player.add_to_inventory(self.reward_armor)
+            display.announce(f"You gained {self.reward_weapon.name} and {self.reward_armor.name}!")
         else:
-            display.announce("You are defeated and unable to retrieve the fragment.", pause=False) 
+            display.announce("You are defeated and unable to retrieve the items.", pause=False)
 
 class Guardian(combat.Monster):
     def __init__(self, name):
@@ -161,12 +190,14 @@ class Guardian(combat.Monster):
 
 class Jungle(location.SubLocation):
     def __init__(self, main_location, island_map, player):
-       super().__init__(main_location)
-       self.name = "jungle"
-       self.island_map = island_map
-       self.player = player
-       self.enemy = JungleBeast("jungle beast")
-
+        super().__init__(main_location)
+        self.name = "jungle"
+        self.island_map = island_map
+        self.player = player
+        self.enemy = JungleBeast("Jungle Beast")
+        self.reward_weapon = Weapon("Vine Whip", damage=18)
+        self.reward_armor = Armor("Leafmail Armor", defense=7)
+        
     def enter(self):
         display.announce("You arrive at the jungle. A beast blocks the way to a map fragment!")
         display.announce("Prepare to fight!")
@@ -181,6 +212,19 @@ class Jungle(location.SubLocation):
             elif action == "run":
                 display.announce("You run back to the beach!", pause=False)
                 return
+
+        if self.player.health > 0:
+            display.announce("You have defeated the Jungle Beast!", pause=False)
+            display.announce("You find the third map fragment and powerful items hidden under a rock!", pause=False)
+            fragment = self.island_map.fragments[2]  # Southern fragment
+            fragment.find()
+            self.player.add_to_inventory(fragment)
+            self.player.add_to_inventory(self.reward_weapon)
+            self.player.add_to_inventory(self.reward_armor)
+            display.announce(f"You gained {self.reward_weapon.name} and {self.reward_armor.name}!")
+        else:
+            display.announce("You are defeated and unable to retrieve the items.", pause=False)
+
 
         if self.player.health > 0:
             display.announce("You have defeated the Jungle Beast!", pause=False)
