@@ -397,11 +397,11 @@ class TreasureSite(location.SubLocation):
         display.announce("The island falls silent as you stand victorious.", pause=False)
         display.announce("YOU WIN!", pause=False)
 
-        # Optionally, offer the player a replay or exit prompt
+       
         action = input("Would you like to play again? (yes/no): ").strip().lower()
         if action == "yes":
             display.announce("Restarting the game...")
-            # Add logic to restart the game here if applicable
+            # Add logic to restart the game here if you want to
         else:
             display.announce("Thank you for playing! Goodbye.")
             exit()
